@@ -4,8 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Skin Clinic – Hanamkonda</title>
+<!-- Open the network connections early, in parallel with everything else,
+     so by the time the code actually needs them there's no handshake delay -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="preconnect" href="https://xmaqmzgxsqksrdbysnqu.supabase.co">
+<link rel="dns-prefetch" href="https://xmaqmzgxsqksrdbysnqu.supabase.co">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 <style>
 /* ── VARIABLES ─────────────────────────────────────────────── */
 :root{
@@ -1456,20 +1463,25 @@ var GROQ_MODEL = 'llama-3.3-70b-versatile';
 var GROQ_VISION_MODEL = 'qwen/qwen3.6-27b'; // used for prescription photo analysis (reads images)
 
 // ═══ INIT SUPABASE ════════════════════════════════════════════
+// db is created by initSupabaseClient(), called at the top of the
+// DOMContentLoaded handler below — that's the earliest safe point now that
+// the Supabase library itself loads with `defer` (non-blocking).
 var db;
-try {
-  db = window.supabase.createClient(SUPA_URL, SUPA_KEY);
-} catch (e) {
-  // Falls back to a stub so the rest of the site still works on default content
-  // until real Supabase credentials are added above.
-  var _stubResult = { data: null, error: { message: 'Supabase not configured' } };
-  var _stubBuilder = {
-    select:function(){return this;}, insert:function(){return this;}, update:function(){return this;},
-    upsert:function(){return this;}, delete:function(){return this;}, eq:function(){return this;},
-    order:function(){return this;}, single:function(){return this;},
-    then:function(resolve){return Promise.resolve(_stubResult).then(resolve);}
-  };
-  db = { from:function(){return _stubBuilder;} };
+function initSupabaseClient() {
+  try {
+    db = window.supabase.createClient(SUPA_URL, SUPA_KEY);
+  } catch (e) {
+    // Falls back to a stub so the rest of the site still works on default content
+    // until real Supabase credentials are added above.
+    var _stubResult = { data: null, error: { message: 'Supabase not configured' } };
+    var _stubBuilder = {
+      select:function(){return this;}, insert:function(){return this;}, update:function(){return this;},
+      upsert:function(){return this;}, delete:function(){return this;}, eq:function(){return this;},
+      order:function(){return this;}, single:function(){return this;},
+      then:function(resolve){return Promise.resolve(_stubResult).then(resolve);}
+    };
+    db = { from:function(){return _stubBuilder;} };
+  }
 }
 
 // ═══ STATE ════════════════════════════════════════════════════
@@ -1556,36 +1568,41 @@ var defCP = [
 // ═══ SUPABASE LOAD ════════════════════════════════════════════
 async function dbLoad() {
   try {
-    // Load treatments
-    var r1 = await db.from('treatments').select('*').order('sort_order');
+    // Fire all 5 queries at once instead of waiting for each one in turn —
+    // they don't depend on each other, so this cuts total wait time down to
+    // whichever single query is slowest, instead of the sum of all 5.
+    var results = await Promise.all([
+      db.from('treatments').select('*').order('sort_order'),
+      db.from('gallery_ba').select('*').order('sort_order'),
+      db.from('clinic_photos').select('*').order('sort_order'),
+      db.from('testimonials').select('*').order('sort_order').then(function(r){return r;}, function(e){return {data:null,error:e};}),
+      db.from('settings').select('*')
+    ]);
+    var r1 = results[0], r2 = results[1], r3 = results[2], r3b = results[3], r4 = results[4];
+
+    // Treatments
     if (r1.data && r1.data.length > 0) {
       treatments = r1.data.filter(function(r){ return r.name && r.name.trim().length > 0 && r.price > 0; })
         .map(function(r){ return {id:r.id,icon:r.icon||'💊',name:r.name,desc:r.description||'',price:r.price,imgUrl:(r.img_url&&r.img_url.startsWith('http'))?r.img_url:null,duration:r.duration||'',aftercare:r.aftercare||''}; });
     }
     if (!treatments.length) treatments = JSON.parse(JSON.stringify(defTreats));
 
-    // Load gallery
-    var r2 = await db.from('gallery_ba').select('*').order('sort_order');
+    // Gallery
     if (r2.data && r2.data.length > 0) {
       galleryItems = r2.data.map(function(r){ return {id:r.id,treatment:r.treatment,desc:r.description||'',sessions:r.sessions||'',beforeEmoji:'📸',afterEmoji:'✨',beforeImg:(r.before_url&&r.before_url.startsWith('http'))?r.before_url:null,afterImg:(r.after_url&&r.after_url.startsWith('http'))?r.after_url:null}; });
     } else { galleryItems = JSON.parse(JSON.stringify(defGallery)); }
 
-    // Load clinic photos
-    var r3 = await db.from('clinic_photos').select('*').order('sort_order');
+    // Clinic photos
     if (r3.data && r3.data.length > 0) {
       clinicPhotos = r3.data.map(function(r){ return {id:r.id,label:r.label,img:(r.photo_url&&r.photo_url.startsWith('http'))?r.photo_url:null,emoji:'🏥',branch:r.branch||'b1'}; });
     } else { clinicPhotos = JSON.parse(JSON.stringify(defCP)); }
 
-    // Load testimonials
-    try {
-      var r3b = await db.from('testimonials').select('*').order('sort_order');
-      if (r3b.data && r3b.data.length > 0) {
-        testimonials = r3b.data.map(function(r){ return {id:r.id,name:r.name,rating:r.rating||5,text:r.text,treatment:r.treatment||''}; });
-      } else { testimonials = JSON.parse(JSON.stringify(defTesti)); }
-    } catch(e){ testimonials = JSON.parse(JSON.stringify(defTesti)); }
+    // Testimonials
+    if (r3b && r3b.data && r3b.data.length > 0) {
+      testimonials = r3b.data.map(function(r){ return {id:r.id,name:r.name,rating:r.rating||5,text:r.text,treatment:r.treatment||''}; });
+    } else { testimonials = JSON.parse(JSON.stringify(defTesti)); }
 
-    // Load settings
-    var r4 = await db.from('settings').select('*');
+    // Settings
     if (r4.data) {
       var pwd = r4.data.find(function(x){return x.key==='admin_password';});
       if (pwd) ADMIN_PASS = pwd.value;
@@ -3351,6 +3368,11 @@ function showToast(msg,dur){var t=document.getElementById('toast');t.textContent
 
 // ═══ INIT ══════════════════════════════════════════════════════
 window.addEventListener('DOMContentLoaded', function(){
+  // Must run first — everything below (renderBranch, dbLoad, etc.) uses `db`.
+  // Safe here because deferred scripts (incl. the Supabase library) finish
+  // loading before DOMContentLoaded fires.
+  initSupabaseClient();
+
   // tyov click to close
   document.getElementById('tyov').addEventListener('click',function(e){if(e.target.id==='tyov')closeTY();});
 
