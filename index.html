@@ -81,6 +81,35 @@ nav.scrolled{background:rgba(253,248,243,.96);backdrop-filter:blur(22px);border-
 .mmbtns{display:flex;gap:8px;margin-top:4px}
 .mmbtns a,.mmbtns button{flex:1;text-align:center;justify-content:center}
 
+/* ── TOP VIDEO SECTIONS ────────────────────────────────────── */
+.topvid{position:relative;width:100%;height:100vh;height:100svh;min-height:520px;overflow:hidden;background:linear-gradient(135deg,var(--p100),var(--b100))}
+.topvid.tv-hidden{display:none}
+.topvid video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.topvid-overlay{position:absolute;inset:0;background:linear-gradient(0deg,rgba(20,10,4,.62) 0%,rgba(20,10,4,.12) 42%,rgba(20,10,4,.02) 100%);display:flex;align-items:flex-end;padding:0 6% 8%}
+.topvid-cap{font-family:'Cormorant Garamond',serif;font-size:clamp(38px,7vw,96px);font-weight:300;font-style:italic;color:#fff;text-shadow:0 2px 24px rgba(0,0,0,.4);max-width:900px;line-height:1.05;animation:heroEl .9s ease both}
+.topvid-scroll{position:absolute;bottom:34px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;color:rgba(255,255,255,.75);font-size:10px;letter-spacing:.2em;text-transform:uppercase;font-family:'DM Sans',sans-serif;animation:scrollBounce 2.2s ease-in-out infinite}
+.topvid-scroll::after{content:'';width:1px;height:26px;background:linear-gradient(180deg,rgba(255,255,255,.85),transparent)}
+@keyframes scrollBounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(8px)}}
+#topvid2 .topvid-scroll{bottom:96px}
+#topvid2 .introsound{bottom:34px}
+@media(max-width:700px){.topvid{min-height:460px}.topvid-cap{max-width:100%}#topvid2 .topvid-scroll{bottom:86px}}
+
+/* ── SCROLL STORY (frame-by-frame scroll-scrub, replaces top video 1) ──── */
+.scrollstory{position:relative;width:100%;background:#0b0806}
+.scrollstory.ss-hidden{display:none}
+.ss-track{position:relative;width:100%}
+.ss-sticky{position:sticky;top:0;height:100vh;height:100svh;width:100%;overflow:hidden;background:#0b0806;display:flex;align-items:center;justify-content:center}
+.ss-canvas{width:100%;height:100%;display:block;opacity:0;transition:opacity .6s ease}
+.ss-canvas.ready{opacity:1}
+.ss-scroll{position:absolute;bottom:34px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;color:rgba(255,255,255,.75);font-size:10px;letter-spacing:.2em;text-transform:uppercase;font-family:'DM Sans',sans-serif;animation:scrollBounce 2.2s ease-in-out infinite;z-index:2;pointer-events:none}
+.ss-scroll::after{content:'';width:1px;height:26px;background:linear-gradient(180deg,rgba(255,255,255,.85),transparent)}
+/* Admin: scroll-story frame grid */
+.ssfitem{position:relative;border-radius:8px;overflow:hidden;border:1px solid var(--b100);aspect-ratio:1/1;background:var(--p50)}
+.ssfitem img{width:100%;height:100%;object-fit:cover;display:block}
+.ssfitem .ssfx{position:absolute;top:3px;right:3px;width:20px;height:20px;border-radius:50%;background:rgba(0,0,0,.55);color:#fff;border:none;font-size:11px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s}
+.ssfitem .ssfx:hover{background:var(--err)}
+.ssfitem .ssfidx{position:absolute;bottom:3px;left:3px;background:rgba(0,0,0,.55);color:#fff;font-size:9px;padding:1px 5px;border-radius:8px}
+
 /* ── HERO ───────────────────────────────────────────────────── */
 .hero{min-height:100vh;display:grid;grid-template-columns:1fr 1fr;position:relative;overflow:hidden}
 .hbg{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 70% 50%,var(--p100) 0%,transparent 70%),radial-gradient(ellipse 40% 40% at 20% 80%,var(--b100) 0%,transparent 60%);transition:background .4s}
@@ -812,6 +841,24 @@ body.theme-ugadi .thbadge{background:linear-gradient(90deg,#7B1FA2,#E65100)}
 </div>
 
 <!-- HERO -->
+<!-- SCROLL STORY (frame-by-frame scroll-scrub, replaces the old first video section) -->
+<section class="scrollstory ss-hidden" id="scrollstory">
+  <div class="ss-track" id="ssTrack">
+    <div class="ss-sticky">
+      <canvas id="ssCanvas" class="ss-canvas"></canvas>
+      <div class="ss-scroll">Scroll</div>
+    </div>
+  </div>
+</section>
+
+<!-- TOP VIDEO 2 -->
+<section class="topvid tv-hidden" id="topvid2">
+  <video id="topVid2" playsinline webkit-playsinline="true" loop preload="metadata"></video>
+  <div class="topvid-overlay"><div class="topvid-cap" id="topVid2Cap"></div></div>
+  <button class="introsound" id="topVid2Sound" onclick="unmuteTopVideo(2)">🔇 Tap for sound</button>
+  <div class="topvid-scroll">Scroll</div>
+</section>
+
 <section class="hero">
   <div class="hbg"></div>
   <div class="hleft">
@@ -1170,6 +1217,50 @@ body.theme-ugadi .thbadge{background:linear-gradient(90deg,#7B1FA2,#E65100)}
               </label>
             </div>
           </div>
+        </div>
+
+        <div class="ssdiv"></div>
+
+        <div class="sssec">
+          <div class="ssh">🎞️ Scroll Story (Section 1)</div>
+          <div style="margin-bottom:16px">
+            <div style="font-size:13px;color:var(--tl);line-height:1.6">Upload a sequence of photos — 100, 300, even 1000 frames — and visitors scrub through them just by scrolling, like a stop-motion reveal. Select every frame at once, named so they sort in order (e.g. frame001.jpg, frame002.jpg…). Leave it empty and this section stays hidden on the live site.</div>
+          </div>
+
+          <div class="introbtnrow">
+            <button class="upbtn" onclick="document.getElementById('ssFrameFiles').click()">📂 Add Frames</button>
+            <input type="file" id="ssFrameFiles" accept="image/*" multiple style="display:none" onchange="uploadScrollStoryFrames(event)">
+            <button class="upbtn" id="ssClearBtn" style="background:var(--err);display:none" onclick="clearScrollStoryFrames()">🗑 Clear All Frames</button>
+          </div>
+          <div id="ssUploadStatus" style="font-size:12px;color:var(--tl);margin-top:8px"></div>
+          <div class="galgrid" id="ssFrameGrid" style="margin-top:14px;max-height:280px;overflow-y:auto"></div>
+        </div>
+
+        <div class="ssdiv"></div>
+
+        <div class="sssec">
+          <div class="ssh">🎬 Top Page Video (Section 2)</div>
+          <div style="margin-bottom:16px">
+            <div style="font-size:13px;color:var(--tl);line-height:1.6">A full-width video section shown right after the scroll story, above the hero banner. Leave it empty and this section stays hidden. MP4 recommended, muted &amp; looping, keep under ~30MB for fast loading.</div>
+          </div>
+
+          <div class="logorow">
+            <div class="introprev" id="topvidPrev2">
+              <video id="topvidPrevVid2" muted playsinline></video>
+              <span id="topvidPrevTxt2">No video yet</span>
+            </div>
+            <div class="loginfo">
+              <h4>Top Video</h4>
+              <div class="introbtnrow">
+                <button class="upbtn" onclick="document.getElementById('topvidfile2').click()">📂 Upload Video</button>
+                <input type="file" id="topvidfile2" accept="video/*" style="display:none" onchange="uploadTopVideo(2,event)">
+                <button class="upbtn" id="topvidRemoveBtn2" style="background:var(--err);display:none" onclick="removeTopVideo(2)">🗑 Remove</button>
+              </div>
+              <div class="fg" style="margin-top:10px"><label>Caption (optional, shown over the video)</label><input type="text" id="topvidCapInput2" placeholder="e.g. Meet our team"></div>
+              <button class="upbtn" style="margin-top:10px" onclick="saveTopVideoCaption(2)">✦ Save Caption</button>
+            </div>
+          </div>
+          <div id="topvidStatus" style="font-size:12px;color:var(--ok);margin-top:10px;display:none">✅ Saved!</div>
         </div>
 
         <div class="ssdiv"></div>
@@ -1537,6 +1628,8 @@ var currentTheme = 'daily';
 var aiTraining = '';
 var introVideoUrl = '';
 var introVideoEnabled = true;
+var topVideos = {2:{url:'',caption:''}};
+var scrollStoryFrames = [];
 var bfileData = null;
 var afileData = null;
 var cpfileData = null;
@@ -1642,8 +1735,16 @@ async function dbLoad() {
       if (hs && hs.value) heroSub = hs.value;
       var hd = r4.data.find(function(x){return x.key==='hero_desc';});
       if (hd && hd.value) heroDesc = hd.value;
+      var tv2u = r4.data.find(function(x){return x.key==='top_video_2_url';});
+      if (tv2u && tv2u.value) topVideos[2].url = tv2u.value;
+      var tv2c = r4.data.find(function(x){return x.key==='top_video_2_caption';});
+      if (tv2c && tv2c.value) topVideos[2].caption = tv2c.value;
+      var ssf = r4.data.find(function(x){return x.key==='scrollstory_frames';});
+      if (ssf && ssf.value) { try { scrollStoryFrames = JSON.parse(ssf.value) || []; } catch(e){ scrollStoryFrames = []; } }
     }
 
+    applyTopVideos();
+    initScrollStory();
     renderAll();
     startIntro();
     showToast('✅ Connected to cloud!', 1800);
@@ -2469,6 +2570,361 @@ async function removeIntroVideo(){
   showToast('🗑 Intro video removed');
 }
 
+// ═══ TOP PAGE VIDEO (section shown after the scroll story, above the hero) ═
+function applyTopVideos(){
+  [2].forEach(function(i){
+    var sec=document.getElementById('topvid'+i);
+    var vid=document.getElementById('topVid'+i);
+    var cap=document.getElementById('topVid'+i+'Cap');
+    var snd=document.getElementById('topVid'+i+'Sound');
+    var data=topVideos[i];
+    if(data && data.url){
+      if(vid.getAttribute('src')!==data.url){
+        vid.src=data.url;
+        vid.dataset.started='0';
+        if(snd) snd.classList.remove('vis');
+      }
+      cap.textContent=data.caption||'';
+      cap.style.display=data.caption?'block':'none';
+      sec.classList.remove('tv-hidden');
+      observeTopVideo(i);
+    } else {
+      vid.removeAttribute('src');
+      sec.classList.add('tv-hidden');
+    }
+  });
+}
+
+// Plays each top video (attempting sound first) only once it scrolls into view,
+// falling back to a muted autoplay + "Tap for sound" button if the browser blocks
+// unmuted autoplay — same pattern as the intro video overlay.
+var _topVidObservers = {};
+function observeTopVideo(i){
+  if(_topVidObservers[i]) return; // already watching this section
+  var sec=document.getElementById('topvid'+i);
+  if(!sec || !('IntersectionObserver' in window)){ playTopVideo(i); return; }
+  var obs=new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      var vid=document.getElementById('topVid'+i);
+      if(entry.isIntersecting){ playTopVideo(i); }
+      else if(vid && !vid.paused){ vid.pause(); }
+    });
+  },{threshold:0.35});
+  obs.observe(sec);
+  _topVidObservers[i]=obs;
+}
+
+function playTopVideo(i){
+  var vid=document.getElementById('topVid'+i);
+  var snd=document.getElementById('topVid'+i+'Sound');
+  if(!vid || !vid.getAttribute('src')) return;
+  if(vid.dataset.started==='1'){
+    if(vid.paused) vid.play().catch(function(){});
+    return;
+  }
+  vid.dataset.started='1';
+  vid.muted=false;
+  var p=vid.play();
+  if(p&&p.catch){
+    p.catch(function(){
+      // Browser blocked autoplay-with-sound — fall back to muted + show tap-for-sound
+      vid.muted=true;
+      vid.play().catch(function(){});
+      if(snd) snd.classList.add('vis');
+    });
+  }
+}
+
+function unmuteTopVideo(i){
+  var vid=document.getElementById('topVid'+i);
+  if(!vid) return;
+  vid.muted=false;
+  var snd=document.getElementById('topVid'+i+'Sound');
+  if(snd) snd.classList.remove('vis');
+}
+
+function renderTopVideoAdmin(){
+  [2].forEach(function(i){
+    var pv=document.getElementById('topvidPrevVid'+i);
+    var txt=document.getElementById('topvidPrevTxt'+i);
+    var rmBtn=document.getElementById('topvidRemoveBtn'+i);
+    var capInput=document.getElementById('topvidCapInput'+i);
+    var data=topVideos[i];
+    if(data && data.url){
+      pv.src=data.url;pv.style.display='block';txt.style.display='none';
+      rmBtn.style.display='inline-block';
+    } else {
+      pv.style.display='none';pv.removeAttribute('src');txt.style.display='block';txt.textContent='No video yet';
+      rmBtn.style.display='none';
+    }
+    if(capInput) capInput.value=(data&&data.caption)||'';
+  });
+}
+
+function flashTopVidStatus(){
+  var s=document.getElementById('topvidStatus');
+  if(!s)return;
+  s.style.display='block';
+  setTimeout(function(){s.style.display='none';},2200);
+}
+
+async function uploadTopVideo(i,e){
+  var f=e.target.files[0];if(!f)return;
+  if(!f.type.startsWith('video/')){showToast('⚠️ Please select a video file',2500);return;}
+  showToast('Uploading video... please wait',5000);
+  try{
+    var ext=(f.name.split('.').pop()||'mp4').toLowerCase();
+    var name='top-video-'+i+'/'+Date.now()+'.'+ext;
+    var up=await db.storage.from('clinic-images').upload(name,f,{contentType:f.type,upsert:true});
+    if(up.error) throw up.error;
+    var url=db.storage.from('clinic-images').getPublicUrl(name).data.publicUrl;
+    topVideos[i].url=url;
+    await db.from('settings').upsert({key:'top_video_'+i+'_url',value:url});
+    renderTopVideoAdmin();
+    applyTopVideos();
+    showToast('✅ Video '+i+' saved!');
+  }catch(err){
+    console.warn('Top video upload failed',err);
+    showToast('❌ Upload failed — try a smaller video file',3500);
+  }
+  e.target.value='';
+}
+
+async function saveTopVideoCaption(i){
+  var capInput=document.getElementById('topvidCapInput'+i);
+  var val=capInput?capInput.value.trim():'';
+  topVideos[i].caption=val;
+  await db.from('settings').upsert({key:'top_video_'+i+'_caption',value:val});
+  applyTopVideos();
+  flashTopVidStatus();
+}
+
+async function removeTopVideo(i){
+  topVideos[i]={url:'',caption:''};
+  await db.from('settings').upsert({key:'top_video_'+i+'_url',value:''});
+  await db.from('settings').upsert({key:'top_video_'+i+'_caption',value:''});
+  renderTopVideoAdmin();
+  applyTopVideos();
+  showToast('🗑 Video '+i+' removed');
+}
+
+// ═══ SCROLL STORY (frame-by-frame scroll-scrub, section 1) ═════
+var ssCanvas, ssCtx, ssImgs = [], ssLastGoodIdx = -1, ssInited = false, ssPreloadStarted = false;
+
+function ssResizeCanvas(){
+  if(!ssCanvas) return;
+  var sticky = ssCanvas.parentElement;
+  var dpr = Math.min(window.devicePixelRatio||1, 2);
+  ssCanvas.width = sticky.clientWidth*dpr;
+  ssCanvas.height = sticky.clientHeight*dpr;
+}
+
+function ssComputeTrackHeight(){
+  var track = document.getElementById('ssTrack');
+  if(!track) return;
+  var n = scrollStoryFrames.length;
+  var vh = window.innerHeight;
+  var px = Math.min(Math.max(n*14, vh*2), vh*10);
+  track.style.height = px+'px';
+}
+
+function ssDrawImageCover(img){
+  var cw=ssCanvas.width, ch=ssCanvas.height;
+  var iw=img.naturalWidth, ih=img.naturalHeight;
+  if(!iw||!ih) return;
+  var scale=Math.max(cw/iw, ch/ih);
+  var dw=iw*scale, dh=ih*scale;
+  var dx=(cw-dw)/2, dy=(ch-dh)/2;
+  ssCtx.clearRect(0,0,cw,ch);
+  ssCtx.drawImage(img,dx,dy,dw,dh);
+}
+
+function ssGetImage(idx){
+  if(idx<0||idx>=scrollStoryFrames.length) return null;
+  var img=ssImgs[idx];
+  if(!img){
+    img=new Image();
+    img.decoding='async';
+    img.src=scrollStoryFrames[idx];
+    ssImgs[idx]=img;
+  }
+  return img;
+}
+
+function ssDraw(idx){
+  if(!ssCanvas||!scrollStoryFrames.length) return;
+  var img=ssGetImage(idx);
+  if(img && img.complete && img.naturalWidth){
+    ssDrawImageCover(img);
+    ssLastGoodIdx=idx;
+    ssCanvas.classList.add('ready');
+  } else {
+    if(ssLastGoodIdx>=0){
+      var fb=ssGetImage(ssLastGoodIdx);
+      if(fb && fb.complete && fb.naturalWidth) ssDrawImageCover(fb);
+    }
+    if(img){ img.onload=function(){ ssDraw(idx); }; }
+  }
+}
+
+function ssOnScroll(){
+  var track=document.getElementById('ssTrack');
+  if(!track||!scrollStoryFrames.length) return;
+  var rect=track.getBoundingClientRect();
+  var vh=window.innerHeight;
+  var total=rect.height-vh;
+  if(total<=0) return;
+  var progress=Math.max(0,Math.min(1, -rect.top/total));
+  var idx=Math.round(progress*(scrollStoryFrames.length-1));
+  ssDraw(idx);
+}
+
+function ssBeginPreload(){
+  if(ssPreloadStarted) return;
+  ssPreloadStarted=true;
+  for(var i=0;i<scrollStoryFrames.length;i++){ ssGetImage(i); }
+}
+
+function renderScrollStory(){
+  var sec=document.getElementById('scrollstory');
+  if(!sec) return;
+  if(scrollStoryFrames.length>0){
+    sec.classList.remove('ss-hidden');
+    ssImgs=[];
+    ssLastGoodIdx=-1;
+    ssPreloadStarted=false;
+    if(ssCanvas) ssCanvas.classList.remove('ready');
+    ssResizeCanvas();
+    ssComputeTrackHeight();
+    ssDraw(0);
+  } else {
+    sec.classList.add('ss-hidden');
+  }
+}
+
+function initScrollStory(){
+  ssCanvas=document.getElementById('ssCanvas');
+  if(!ssCanvas) return;
+  ssCtx=ssCanvas.getContext('2d');
+  renderScrollStory();
+  if(ssInited) return;
+  ssInited=true;
+  window.addEventListener('resize', function(){
+    ssResizeCanvas();
+    ssComputeTrackHeight();
+    ssOnScroll();
+  });
+  var ssTicking=false;
+  window.addEventListener('scroll', function(){
+    if(!ssTicking){
+      ssTicking=true;
+      requestAnimationFrame(function(){ ssOnScroll(); ssTicking=false; });
+    }
+  }, {passive:true});
+  var sec=document.getElementById('scrollstory');
+  if(sec && 'IntersectionObserver' in window){
+    var ssObs=new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ ssBeginPreload(); ssObs.disconnect(); }
+      });
+    }, {rootMargin:'600px 0px'});
+    ssObs.observe(sec);
+  } else {
+    ssBeginPreload();
+  }
+}
+
+// ── Admin: upload / manage scroll-story frames ──────────────────
+function ssNaturalCompare(a,b){
+  return a.localeCompare(b, undefined, {numeric:true, sensitivity:'base'});
+}
+
+function ssResizeAndEncode(file){
+  return new Promise(function(resolve,reject){
+    var reader=new FileReader();
+    reader.onerror=function(){ reject(reader.error); };
+    reader.onload=function(){
+      var img=new Image();
+      img.onerror=function(){ reject(new Error('Could not read image: '+file.name)); };
+      img.onload=function(){
+        var w=img.naturalWidth, h=img.naturalHeight, MAX_DIM=1600;
+        if(w>MAX_DIM||h>MAX_DIM){
+          var scale=MAX_DIM/Math.max(w,h);
+          w=Math.round(w*scale); h=Math.round(h*scale);
+        }
+        var c=document.createElement('canvas');
+        c.width=w; c.height=h;
+        c.getContext('2d').drawImage(img,0,0,w,h);
+        c.toBlob(function(blob){ resolve(blob); }, 'image/jpeg', 0.82);
+      };
+      img.src=reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+async function uploadScrollStoryFrames(e){
+  var files=Array.from(e.target.files||[]);
+  if(!files.length) return;
+  files.sort(function(a,b){ return ssNaturalCompare(a.name,b.name); });
+  var statusEl=document.getElementById('ssUploadStatus');
+  var stamp=Date.now();
+  var uploaded=[];
+  for(var i=0;i<files.length;i++){
+    var f=files[i];
+    if(statusEl) statusEl.textContent='Uploading frame '+(i+1)+' of '+files.length+'…';
+    try{
+      var blob=await ssResizeAndEncode(f);
+      var path='scroll-story/'+stamp+'-'+String(i).padStart(4,'0')+'.jpg';
+      var up=await db.storage.from('clinic-images').upload(path, blob, {contentType:'image/jpeg', upsert:true});
+      if(up.error) throw up.error;
+      var url=db.storage.from('clinic-images').getPublicUrl(path).data.publicUrl;
+      uploaded.push(url);
+    }catch(err){
+      console.warn('Frame upload failed', f.name, err);
+    }
+  }
+  scrollStoryFrames=scrollStoryFrames.concat(uploaded);
+  await db.from('settings').upsert({key:'scrollstory_frames', value:JSON.stringify(scrollStoryFrames)});
+  renderScrollStoryAdmin();
+  renderScrollStory();
+  showToast('✅ Added '+uploaded.length+' frame'+(uploaded.length===1?'':'s')+'!');
+  e.target.value='';
+}
+
+async function removeScrollStoryFrame(idx){
+  scrollStoryFrames.splice(idx,1);
+  await db.from('settings').upsert({key:'scrollstory_frames', value:JSON.stringify(scrollStoryFrames)});
+  renderScrollStoryAdmin();
+  renderScrollStory();
+}
+
+async function clearScrollStoryFrames(){
+  if(!confirm('Remove all '+scrollStoryFrames.length+' frames from the scroll story?')) return;
+  scrollStoryFrames=[];
+  await db.from('settings').upsert({key:'scrollstory_frames', value:'[]'});
+  renderScrollStoryAdmin();
+  renderScrollStory();
+  showToast('🗑 Scroll story cleared');
+}
+
+function renderScrollStoryAdmin(){
+  var grid=document.getElementById('ssFrameGrid');
+  var status=document.getElementById('ssUploadStatus');
+  var clearBtn=document.getElementById('ssClearBtn');
+  if(!grid) return;
+  if(clearBtn) clearBtn.style.display=scrollStoryFrames.length?'inline-block':'none';
+  if(status) status.textContent=scrollStoryFrames.length?(scrollStoryFrames.length+' frame'+(scrollStoryFrames.length===1?'':'s')+' in the sequence.'):'No frames yet — add photos to enable the scroll story.';
+  var showCount=Math.min(scrollStoryFrames.length, 240);
+  var html=scrollStoryFrames.slice(0,showCount).map(function(url,i){
+    return '<div class="ssfitem"><img src="'+url+'" loading="lazy"><span class="ssfidx">'+(i+1)+'</span><button class="ssfx" onclick="removeScrollStoryFrame('+i+')" title="Remove">✕</button></div>';
+  }).join('');
+  if(scrollStoryFrames.length>showCount){
+    html+='<div class="ssfitem" style="display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--tl);text-align:center;padding:6px">+'+(scrollStoryFrames.length-showCount)+' more</div>';
+  }
+  grid.innerHTML=html;
+}
+
 // ═══ LEGAL / PRIVACY ═══════════════════════════════════════════
 var LEGAL_CONTENT = {
   privacy: {
@@ -2695,7 +3151,7 @@ function switchTab(name,btn){
   if(name==='analytics')renderAnalytics();
   if(name==='broadcast')renderBroadcastList();
   if(name==='aitrain'){document.getElementById('aitraintxt').value=aiTraining;document.getElementById('aitrainstatus').style.display='none';}
-  if(name==='sitesettings'){renderThemeGrid();renderIntroAdmin();loadStatsForm();loadDoctorProfileForm();loadHeroSectionForm();}
+  if(name==='sitesettings'){renderThemeGrid();renderIntroAdmin();renderTopVideoAdmin();renderScrollStoryAdmin();loadStatsForm();loadDoctorProfileForm();loadHeroSectionForm();}
   if(name==='pwd'){
     document.getElementById('curUsernameDisplay').textContent=ADMIN_USER;
     document.getElementById('pwdUsernameDisplay').textContent=ADMIN_USER;
