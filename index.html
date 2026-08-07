@@ -431,6 +431,9 @@ footer::before{content:'';position:absolute;width:600px;height:600px;border-radi
 .atab.active{color:var(--b400);border-bottom-color:var(--b400)}
 .sssec{margin-bottom:4px}
 .ssh{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:var(--b600);margin-bottom:14px}
+.devtogrow{display:flex;gap:8px}
+.devtog{padding:8px 16px;border-radius:20px;border:1.5px solid var(--b100);background:var(--cream);color:var(--tl);font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;transition:.2s}
+.devtog.active{background:var(--p400);border-color:var(--p400);color:#fff}
 .ssdiv{height:1px;background:var(--b100);margin:28px 0}
 .asec{display:none}
 .asec.active{display:block}
@@ -583,20 +586,10 @@ body.theme-ugadi .thbadge{background:linear-gradient(90deg,#7B1FA2,#E65100)}
 .cursor-glow{position:fixed;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(242,128,80,.06) 0%,transparent 70%);pointer-events:none;z-index:1;transform:translate(-50%,-50%);transition:transform .08s linear;display:none}
 @media(hover:hover){.cursor-glow{display:block}}
 
-/* ── INTRO VIDEO ───────────────────────────────────────────── */
-.introov{position:fixed;inset:0;z-index:10000;background:#000;display:none;align-items:center;justify-content:center;animation:fadeIn .3s ease}
-.introov.open{display:flex}
-.introov video{width:100%;height:100%;object-fit:contain;background:#000}
-.introskip{position:absolute;top:22px;right:22px;background:rgba(255,255,255,.14);color:#fff;border:1.5px solid rgba(255,255,255,.5);backdrop-filter:blur(10px);padding:10px 22px;border-radius:24px;font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;letter-spacing:.04em;transition:all .25s ease;display:flex;align-items:center;gap:6px;z-index:2}
-.introskip:hover{background:rgba(255,255,255,.28);transform:translateY(-1px)}
-.introloader{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:#000}
-.introloader.vis{display:flex}
-.ispin{width:42px;height:42px;border-radius:50%;border:3px solid rgba(255,255,255,.18);border-top-color:rgba(255,255,255,.85);animation:ispin .8s linear infinite}
-@keyframes ispin{to{transform:rotate(360deg)}}
+/* ── SOUND TOGGLE (reused by top video section) ───────────────── */
 .introsound{position:absolute;bottom:34px;left:50%;transform:translateX(-50%);background:rgba(255,255,255,.14);color:#fff;border:1.5px solid rgba(255,255,255,.5);backdrop-filter:blur(10px);padding:9px 20px;border-radius:22px;font-size:12px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;display:none;align-items:center;gap:6px;z-index:2}
 .introsound.vis{display:flex;animation:popIn .35s ease both}
 @media(max-width:640px){
-  .introskip{top:14px;right:14px;padding:8px 16px;font-size:12px}
   .introsound{bottom:22px;padding:8px 16px;font-size:11px}
 }
 
@@ -749,15 +742,6 @@ body.theme-ugadi .thbadge{background:linear-gradient(90deg,#7B1FA2,#E65100)}
 <div class="cursor-glow" id="cursorGlow"></div>
 <div class="thbadge" id="thBadge"></div>
 <div class="theme-flash" id="themeFlash"></div>
-
-<!-- INTRO VIDEO OVERLAY -->
-<div class="introov" id="introOv">
-  <video id="introVid" playsinline webkit-playsinline="true" preload="auto" x-webkit-airplay="allow"></video>
-  <div class="introloader" id="introLoader"><div class="ispin"></div></div>
-  <button class="introsound" id="introSound" onclick="unmuteIntro()">🔇 Tap for sound</button>
-  <button class="introskip" id="introSkip" onclick="skipIntro()" aria-label="Skip intro video">Skip ➤</button>
-</div>
-
 
 <!-- AI CHAT WIDGET (fixed, outside page-wrap) -->
 <div class="cwidget">
@@ -1141,7 +1125,7 @@ body.theme-ugadi .thbadge{background:linear-gradient(90deg,#7B1FA2,#E65100)}
         <button class="atab" onclick="switchTab('pwd',this)">🔐 Password</button>
       </div>
 
-      <!-- SITE SETTINGS TAB (Logo + Intro Video + Stats + Theme) -->
+      <!-- SITE SETTINGS TAB (Logo + Stats + Theme) -->
       <div class="asec active" id="tab-sitesettings">
 
         <!-- Hero Section -->
@@ -1195,37 +1179,17 @@ body.theme-ugadi .thbadge{background:linear-gradient(90deg,#7B1FA2,#E65100)}
 
         <div class="ssdiv"></div>
 
-
-        <div class="sssec">
-          <div class="ssh">🎬 Intro Video</div>
-          <div class="logorow">
-            <div class="introprev" id="introPrev">
-              <video id="introPrevVid" muted playsinline></video>
-              <span id="introPrevTxt">No intro video yet</span>
-            </div>
-            <div class="loginfo">
-              <h4>Intro Video</h4>
-              <p>Plays automatically when a visitor opens the website, with a Skip button on screen. MP4 format recommended, keep under ~30MB for fast loading.</p>
-              <div class="introbtnrow">
-                <button class="upbtn" onclick="document.getElementById('introfile').click()">📂 Change Intro Video</button>
-                <input type="file" id="introfile" accept="video/*" style="display:none" onchange="uploadIntroVideo(event)">
-                <button class="upbtn" id="introRemoveBtn" style="background:var(--err);display:none" onclick="removeIntroVideo()">🗑 Remove</button>
-              </div>
-              <label class="introtoggle">
-                <input type="checkbox" id="introEnableChk" onchange="toggleIntroEnabled(this.checked)">
-                <span>Show intro video to visitors</span>
-              </label>
-            </div>
-          </div>
-        </div>
-
-        <div class="ssdiv"></div>
-
         <div class="sssec">
           <div class="ssh">🎞️ Scroll Story (Section 1)</div>
           <div style="margin-bottom:16px">
             <div style="font-size:13px;color:var(--tl);line-height:1.6">Upload a sequence of photos — 100, 300, even 1000 frames — and visitors scrub through them just by scrolling, like a stop-motion reveal. Select every frame at once, named so they sort in order (e.g. frame001.jpg, frame002.jpg…). Leave it empty and this section stays hidden on the live site.</div>
           </div>
+
+          <div class="devtogrow" id="ssDevToggle">
+            <button type="button" class="devtog active" data-dev="desktop" onclick="setSSAdminDevice('desktop')">💻 Desktop</button>
+            <button type="button" class="devtog" data-dev="mobile" onclick="setSSAdminDevice('mobile')">📱 Mobile</button>
+          </div>
+          <div style="font-size:12px;color:var(--tl);margin:6px 0 12px" id="ssDevHint">Landscape photos (wide, e.g. 1600×900) fill a laptop screen best.</div>
 
           <div class="introbtnrow">
             <button class="upbtn" onclick="document.getElementById('ssFrameFiles').click()">📂 Add Frames</button>
@@ -1244,6 +1208,12 @@ body.theme-ugadi .thbadge{background:linear-gradient(90deg,#7B1FA2,#E65100)}
             <div style="font-size:13px;color:var(--tl);line-height:1.6">A full-width video section shown right after the scroll story, above the hero banner. Leave it empty and this section stays hidden. MP4 recommended, muted &amp; looping, keep under ~30MB for fast loading.</div>
           </div>
 
+          <div class="devtogrow" id="tvDevToggle">
+            <button type="button" class="devtog active" data-dev="desktop" onclick="setTVAdminDevice('desktop')">💻 Desktop</button>
+            <button type="button" class="devtog" data-dev="mobile" onclick="setTVAdminDevice('mobile')">📱 Mobile</button>
+          </div>
+          <div style="font-size:12px;color:var(--tl);margin:6px 0 12px" id="tvDevHint">Landscape video (wide, e.g. 1920×1080) fills a laptop screen best. If no mobile video is uploaded, phones fall back to the desktop one.</div>
+
           <div class="logorow">
             <div class="introprev" id="topvidPrev2">
               <video id="topvidPrevVid2" muted playsinline></video>
@@ -1256,7 +1226,7 @@ body.theme-ugadi .thbadge{background:linear-gradient(90deg,#7B1FA2,#E65100)}
                 <input type="file" id="topvidfile2" accept="video/*" style="display:none" onchange="uploadTopVideo(2,event)">
                 <button class="upbtn" id="topvidRemoveBtn2" style="background:var(--err);display:none" onclick="removeTopVideo(2)">🗑 Remove</button>
               </div>
-              <div class="fg" style="margin-top:10px"><label>Caption (optional, shown over the video)</label><input type="text" id="topvidCapInput2" placeholder="e.g. Meet our team"></div>
+              <div class="fg" style="margin-top:10px"><label>Caption (optional, shown over the video — shared across devices)</label><input type="text" id="topvidCapInput2" placeholder="e.g. Meet our team"></div>
               <button class="upbtn" style="margin-top:10px" onclick="saveTopVideoCaption(2)">✦ Save Caption</button>
             </div>
           </div>
@@ -1626,10 +1596,12 @@ var festAnimId = null;
 var festTimers = [];
 var currentTheme = 'daily';
 var aiTraining = '';
-var introVideoUrl = '';
-var introVideoEnabled = true;
-var topVideos = {2:{url:'',caption:''}};
+var topVideos = {2:{url:'',urlMobile:'',caption:''}};
 var scrollStoryFrames = [];
+var scrollStoryFramesMobile = [];
+var ssAdminDevice = 'desktop'; // which device's frames the admin panel is currently editing
+var tvAdminDevice = 'desktop'; // which device's video the admin panel is currently editing
+function isMobileViewport(){ return window.matchMedia('(max-width:700px)').matches; }
 var bfileData = null;
 var afileData = null;
 var cpfileData = null;
@@ -1713,10 +1685,6 @@ async function dbLoad() {
       if (ail && ail.value) { aiLogo = ail.value; applyAIIdentity(); }
       var aib = r4.data.find(function(x){return x.key==='ai_bio';});
       if (aib && aib.value) { aiBio = aib.value; applyAIIdentity(); }
-      var iv = r4.data.find(function(x){return x.key==='intro_video_url';});
-      if (iv && iv.value) introVideoUrl = iv.value;
-      var ie = r4.data.find(function(x){return x.key==='intro_video_enabled';});
-      if (ie) introVideoEnabled = (ie.value !== 'false');
       var st = r4.data.find(function(x){return x.key==='site_stats';});
       if (st && st.value) { try { siteStats = Object.assign({}, siteStats, JSON.parse(st.value)); } catch(e){} }
       var dph = r4.data.find(function(x){return x.key==='doctor_photo';});
@@ -1737,16 +1705,19 @@ async function dbLoad() {
       if (hd && hd.value) heroDesc = hd.value;
       var tv2u = r4.data.find(function(x){return x.key==='top_video_2_url';});
       if (tv2u && tv2u.value) topVideos[2].url = tv2u.value;
+      var tv2um = r4.data.find(function(x){return x.key==='top_video_2_url_mobile';});
+      if (tv2um && tv2um.value) topVideos[2].urlMobile = tv2um.value;
       var tv2c = r4.data.find(function(x){return x.key==='top_video_2_caption';});
       if (tv2c && tv2c.value) topVideos[2].caption = tv2c.value;
       var ssf = r4.data.find(function(x){return x.key==='scrollstory_frames';});
       if (ssf && ssf.value) { try { scrollStoryFrames = JSON.parse(ssf.value) || []; } catch(e){ scrollStoryFrames = []; } }
+      var ssfm = r4.data.find(function(x){return x.key==='scrollstory_frames_mobile';});
+      if (ssfm && ssfm.value) { try { scrollStoryFramesMobile = JSON.parse(ssfm.value) || []; } catch(e){ scrollStoryFramesMobile = []; } }
     }
 
     applyTopVideos();
     initScrollStory();
     renderAll();
-    startIntro();
     showToast('✅ Connected to cloud!', 1800);
   } catch(e) {
     console.warn('DB load error:', e);
@@ -2462,130 +2433,32 @@ function sendConfirmationEmail(name, email, treatment, branchName, dateStr, time
 
 function closeTY(){document.getElementById('tyov').classList.remove('open');document.body.style.overflow='';stopConf();}
 
-// ═══ INTRO VIDEO ═══════════════════════════════════════════════
-function startIntro(){
-  if(!introVideoUrl || introVideoEnabled===false) return;
-  var ov=document.getElementById('introOv');
-  var vid=document.getElementById('introVid');
-  var loader=document.getElementById('introLoader');
-  var snd=document.getElementById('introSound');
-
-  stopFest(); // pause heavy canvas animations while intro plays, for smooth video
-
-  vid.muted=false;
-  vid.src=introVideoUrl;
-  vid.load();
-  loader.classList.add('vis');
-  snd.classList.remove('vis');
-  ov.classList.add('open');
-  document.body.style.overflow='hidden';
-
-  function tryPlay(){
-    loader.classList.remove('vis');
-    var p=vid.play();
-    if(p&&p.catch){
-      p.catch(function(){
-        // Browser blocked autoplay-with-sound — play muted, show tap-for-sound
-        vid.muted=true;
-        vid.play().catch(function(){});
-        snd.classList.add('vis');
-      });
-    }
-  }
-  if(vid.readyState>=3){tryPlay();}
-  else{vid.addEventListener('canplay',tryPlay,{once:true});}
-
-  vid.onended=function(){skipIntro();};
-}
-
-function unmuteIntro(){
-  var vid=document.getElementById('introVid');
-  vid.muted=false;
-  document.getElementById('introSound').classList.remove('vis');
-}
-
-function skipIntro(){
-  var ov=document.getElementById('introOv');
-  var vid=document.getElementById('introVid');
-  if(!ov.classList.contains('open'))return;
-  ov.classList.remove('open');
-  document.body.style.overflow='';
-  vid.pause();
-  document.getElementById('introLoader').classList.remove('vis');
-  document.getElementById('introSound').classList.remove('vis');
-  // resume festival canvas animation (if active theme has one)
-  if(THEMES[currentTheme]&&THEMES[currentTheme].anim) startFest(THEMES[currentTheme].anim);
-}
-
-function renderIntroAdmin(){
-  var pv=document.getElementById('introPrevVid');
-  var txt=document.getElementById('introPrevTxt');
-  var chk=document.getElementById('introEnableChk');
-  var rmBtn=document.getElementById('introRemoveBtn');
-  if(introVideoUrl){
-    pv.src=introVideoUrl;pv.style.display='block';txt.style.display='none';
-    rmBtn.style.display='inline-block';
-    chk.disabled=false;
-  } else {
-    pv.style.display='none';pv.removeAttribute('src');txt.style.display='block';txt.textContent='No intro video yet';
-    rmBtn.style.display='none';
-    chk.disabled=true;
-  }
-  chk.checked = introVideoEnabled!==false;
-}
-
-async function uploadIntroVideo(e){
-  var f=e.target.files[0];if(!f)return;
-  if(!f.type.startsWith('video/')){showToast('⚠️ Please select a video file',2500);return;}
-  showToast('Uploading intro video... please wait',5000);
-  try{
-    var ext=(f.name.split('.').pop()||'mp4').toLowerCase();
-    var name='intro-video/'+Date.now()+'.'+ext;
-    var up=await db.storage.from('clinic-images').upload(name,f,{contentType:f.type,upsert:true});
-    if(up.error) throw up.error;
-    var url=db.storage.from('clinic-images').getPublicUrl(name).data.publicUrl;
-    introVideoUrl=url;introVideoEnabled=true;
-    await db.from('settings').upsert({key:'intro_video_url',value:url});
-    await db.from('settings').upsert({key:'intro_video_enabled',value:'true'});
-    renderIntroAdmin();
-    showToast('✅ Intro video saved!');
-  }catch(err){
-    console.warn('Intro upload failed',err);
-    showToast('❌ Upload failed — try a smaller video file',3500);
-  }
-  e.target.value='';
-}
-
-function toggleIntroEnabled(checked){
-  introVideoEnabled=checked;
-  db.from('settings').upsert({key:'intro_video_enabled',value:checked?'true':'false'});
-  showToast(checked?'🎬 Intro video enabled':'Intro video disabled');
-}
-
-async function removeIntroVideo(){
-  introVideoUrl='';introVideoEnabled=false;
-  await db.from('settings').upsert({key:'intro_video_url',value:''});
-  await db.from('settings').upsert({key:'intro_video_enabled',value:'false'});
-  renderIntroAdmin();
-  showToast('🗑 Intro video removed');
-}
-
 // ═══ TOP PAGE VIDEO (section shown after the scroll story, above the hero) ═
+var _tvIsMobileMode = null; // tracks which mode each video's src was last picked for
+var _tvResizeBound = false;
 function applyTopVideos(){
+  if(!_tvResizeBound){
+    _tvResizeBound = true;
+    window.addEventListener('resize', function(){
+      if(isMobileViewport()!==_tvIsMobileMode) applyTopVideos();
+    });
+  }
+  var mobileNow = isMobileViewport();
   [2].forEach(function(i){
     var sec=document.getElementById('topvid'+i);
     var vid=document.getElementById('topVid'+i);
     var cap=document.getElementById('topVid'+i+'Cap');
     var snd=document.getElementById('topVid'+i+'Sound');
     var data=topVideos[i];
-    if(data && data.url){
-      if(vid.getAttribute('src')!==data.url){
-        vid.src=data.url;
+    var srcUrl = (mobileNow && data && data.urlMobile) ? data.urlMobile : (data ? data.url : '');
+    if(srcUrl){
+      if(vid.getAttribute('src')!==srcUrl){
+        vid.src=srcUrl;
         vid.dataset.started='0';
         if(snd) snd.classList.remove('vis');
       }
-      cap.textContent=data.caption||'';
-      cap.style.display=data.caption?'block':'none';
+      cap.textContent=(data&&data.caption)||'';
+      cap.style.display=(data&&data.caption)?'block':'none';
       sec.classList.remove('tv-hidden');
       observeTopVideo(i);
     } else {
@@ -2593,11 +2466,12 @@ function applyTopVideos(){
       sec.classList.add('tv-hidden');
     }
   });
+  _tvIsMobileMode = mobileNow;
 }
 
 // Plays each top video (attempting sound first) only once it scrolls into view,
 // falling back to a muted autoplay + "Tap for sound" button if the browser blocks
-// unmuted autoplay — same pattern as the intro video overlay.
+// unmuted autoplay — same tap-for-sound fallback pattern.
 var _topVidObservers = {};
 function observeTopVideo(i){
   if(_topVidObservers[i]) return; // already watching this section
@@ -2643,6 +2517,16 @@ function unmuteTopVideo(i){
   if(snd) snd.classList.remove('vis');
 }
 
+function setTVAdminDevice(dev){
+  tvAdminDevice = dev;
+  document.querySelectorAll('#tvDevToggle .devtog').forEach(function(b){ b.classList.toggle('active', b.dataset.dev===dev); });
+  var hint=document.getElementById('tvDevHint');
+  if(hint) hint.textContent = dev==='mobile'
+    ? 'Portrait video (tall, e.g. 1080×1920) fills a phone screen best. Leave empty and phones just use the desktop video.'
+    : 'Landscape video (wide, e.g. 1920×1080) fills a laptop screen best. If no mobile video is uploaded, phones fall back to the desktop one.';
+  renderTopVideoAdmin();
+}
+
 function renderTopVideoAdmin(){
   [2].forEach(function(i){
     var pv=document.getElementById('topvidPrevVid'+i);
@@ -2650,11 +2534,12 @@ function renderTopVideoAdmin(){
     var rmBtn=document.getElementById('topvidRemoveBtn'+i);
     var capInput=document.getElementById('topvidCapInput'+i);
     var data=topVideos[i];
-    if(data && data.url){
-      pv.src=data.url;pv.style.display='block';txt.style.display='none';
+    var url = data ? (tvAdminDevice==='mobile' ? data.urlMobile : data.url) : '';
+    if(url){
+      pv.src=url;pv.style.display='block';txt.style.display='none';
       rmBtn.style.display='inline-block';
     } else {
-      pv.style.display='none';pv.removeAttribute('src');txt.style.display='block';txt.textContent='No video yet';
+      pv.style.display='none';pv.removeAttribute('src');txt.style.display='block';txt.textContent='No '+tvAdminDevice+' video yet';
       rmBtn.style.display='none';
     }
     if(capInput) capInput.value=(data&&data.caption)||'';
@@ -2671,18 +2556,20 @@ function flashTopVidStatus(){
 async function uploadTopVideo(i,e){
   var f=e.target.files[0];if(!f)return;
   if(!f.type.startsWith('video/')){showToast('⚠️ Please select a video file',2500);return;}
-  showToast('Uploading video... please wait',5000);
+  var devTag = tvAdminDevice==='mobile' ? 'mobile' : 'desktop';
+  showToast('Uploading '+devTag+' video... please wait',5000);
   try{
     var ext=(f.name.split('.').pop()||'mp4').toLowerCase();
-    var name='top-video-'+i+'/'+Date.now()+'.'+ext;
+    var name='top-video-'+i+'/'+devTag+'-'+Date.now()+'.'+ext;
     var up=await db.storage.from('clinic-images').upload(name,f,{contentType:f.type,upsert:true});
     if(up.error) throw up.error;
     var url=db.storage.from('clinic-images').getPublicUrl(name).data.publicUrl;
-    topVideos[i].url=url;
-    await db.from('settings').upsert({key:'top_video_'+i+'_url',value:url});
+    var settingKey = tvAdminDevice==='mobile' ? ('top_video_'+i+'_url_mobile') : ('top_video_'+i+'_url');
+    if(tvAdminDevice==='mobile'){ topVideos[i].urlMobile=url; } else { topVideos[i].url=url; }
+    await db.from('settings').upsert({key:settingKey,value:url});
     renderTopVideoAdmin();
     applyTopVideos();
-    showToast('✅ Video '+i+' saved!');
+    showToast('✅ '+(devTag==='mobile'?'Mobile':'Desktop')+' video saved!');
   }catch(err){
     console.warn('Top video upload failed',err);
     showToast('❌ Upload failed — try a smaller video file',3500);
@@ -2700,16 +2587,23 @@ async function saveTopVideoCaption(i){
 }
 
 async function removeTopVideo(i){
-  topVideos[i]={url:'',caption:''};
-  await db.from('settings').upsert({key:'top_video_'+i+'_url',value:''});
-  await db.from('settings').upsert({key:'top_video_'+i+'_caption',value:''});
+  var settingKey = tvAdminDevice==='mobile' ? ('top_video_'+i+'_url_mobile') : ('top_video_'+i+'_url');
+  if(tvAdminDevice==='mobile'){ topVideos[i].urlMobile=''; } else { topVideos[i].url=''; }
+  await db.from('settings').upsert({key:settingKey,value:''});
   renderTopVideoAdmin();
   applyTopVideos();
-  showToast('🗑 Video '+i+' removed');
+  showToast('🗑 '+(tvAdminDevice==='mobile'?'Mobile':'Desktop')+' video removed');
 }
 
 // ═══ SCROLL STORY (frame-by-frame scroll-scrub, section 1) ═════
 var ssCanvas, ssCtx, ssImgs = [], ssLastGoodIdx = -1, ssInited = false, ssPreloadStarted = false;
+var ssFrames = []; // the frame set actually shown to this visitor (desktop or mobile, picked in renderScrollStory)
+var ssIsMobileMode = null; // tracks which mode ssFrames was last picked for, so we can detect a breakpoint crossing
+
+function ssPickFrames(){
+  if(isMobileViewport() && scrollStoryFramesMobile.length) return scrollStoryFramesMobile;
+  return scrollStoryFrames;
+}
 
 function ssResizeCanvas(){
   if(!ssCanvas) return;
@@ -2722,7 +2616,7 @@ function ssResizeCanvas(){
 function ssComputeTrackHeight(){
   var track = document.getElementById('ssTrack');
   if(!track) return;
-  var n = scrollStoryFrames.length;
+  var n = ssFrames.length;
   var vh = window.innerHeight;
   var px = Math.min(Math.max(n*14, vh*2), vh*10);
   track.style.height = px+'px';
@@ -2740,19 +2634,19 @@ function ssDrawImageCover(img){
 }
 
 function ssGetImage(idx){
-  if(idx<0||idx>=scrollStoryFrames.length) return null;
+  if(idx<0||idx>=ssFrames.length) return null;
   var img=ssImgs[idx];
   if(!img){
     img=new Image();
     img.decoding='async';
-    img.src=scrollStoryFrames[idx];
+    img.src=ssFrames[idx];
     ssImgs[idx]=img;
   }
   return img;
 }
 
 function ssDraw(idx){
-  if(!ssCanvas||!scrollStoryFrames.length) return;
+  if(!ssCanvas||!ssFrames.length) return;
   var img=ssGetImage(idx);
   if(img && img.complete && img.naturalWidth){
     ssDrawImageCover(img);
@@ -2769,26 +2663,28 @@ function ssDraw(idx){
 
 function ssOnScroll(){
   var track=document.getElementById('ssTrack');
-  if(!track||!scrollStoryFrames.length) return;
+  if(!track||!ssFrames.length) return;
   var rect=track.getBoundingClientRect();
   var vh=window.innerHeight;
   var total=rect.height-vh;
   if(total<=0) return;
   var progress=Math.max(0,Math.min(1, -rect.top/total));
-  var idx=Math.round(progress*(scrollStoryFrames.length-1));
+  var idx=Math.round(progress*(ssFrames.length-1));
   ssDraw(idx);
 }
 
 function ssBeginPreload(){
   if(ssPreloadStarted) return;
   ssPreloadStarted=true;
-  for(var i=0;i<scrollStoryFrames.length;i++){ ssGetImage(i); }
+  for(var i=0;i<ssFrames.length;i++){ ssGetImage(i); }
 }
 
 function renderScrollStory(){
   var sec=document.getElementById('scrollstory');
   if(!sec) return;
-  if(scrollStoryFrames.length>0){
+  ssFrames = ssPickFrames();
+  ssIsMobileMode = isMobileViewport();
+  if(ssFrames.length>0){
     sec.classList.remove('ss-hidden');
     ssImgs=[];
     ssLastGoodIdx=-1;
@@ -2797,6 +2693,7 @@ function renderScrollStory(){
     ssResizeCanvas();
     ssComputeTrackHeight();
     ssDraw(0);
+    ssBeginPreload();
   } else {
     sec.classList.add('ss-hidden');
   }
@@ -2810,6 +2707,10 @@ function initScrollStory(){
   if(ssInited) return;
   ssInited=true;
   window.addEventListener('resize', function(){
+    // If the viewport crossed the mobile/desktop breakpoint (e.g. phone
+    // rotated, or a desktop window resized past it), re-pick the right
+    // frame set instead of just resizing the canvas.
+    if(isMobileViewport()!==ssIsMobileMode){ renderScrollStory(); }
     ssResizeCanvas();
     ssComputeTrackHeight();
     ssOnScroll();
@@ -2863,6 +2764,19 @@ function ssResizeAndEncode(file){
   });
 }
 
+function setSSAdminDevice(dev){
+  ssAdminDevice = dev;
+  document.querySelectorAll('#ssDevToggle .devtog').forEach(function(b){ b.classList.toggle('active', b.dataset.dev===dev); });
+  var hint=document.getElementById('ssDevHint');
+  if(hint) hint.textContent = dev==='mobile'
+    ? 'Portrait photos (tall, e.g. 900×1600) fill a phone screen best. Leave empty and phones just use the desktop frames.'
+    : 'Landscape photos (wide, e.g. 1600×900) fill a laptop screen best.';
+  renderScrollStoryAdmin();
+}
+
+function ssActiveAdminFrames(){ return ssAdminDevice==='mobile' ? scrollStoryFramesMobile : scrollStoryFrames; }
+function ssActiveAdminKey(){ return ssAdminDevice==='mobile' ? 'scrollstory_frames_mobile' : 'scrollstory_frames'; }
+
 async function uploadScrollStoryFrames(e){
   var files=Array.from(e.target.files||[]);
   if(!files.length) return;
@@ -2870,12 +2784,13 @@ async function uploadScrollStoryFrames(e){
   var statusEl=document.getElementById('ssUploadStatus');
   var stamp=Date.now();
   var uploaded=[];
+  var devTag = ssAdminDevice==='mobile' ? 'mobile' : 'desktop';
   for(var i=0;i<files.length;i++){
     var f=files[i];
     if(statusEl) statusEl.textContent='Uploading frame '+(i+1)+' of '+files.length+'…';
     try{
       var blob=await ssResizeAndEncode(f);
-      var path='scroll-story/'+stamp+'-'+String(i).padStart(4,'0')+'.jpg';
+      var path='scroll-story/'+devTag+'-'+stamp+'-'+String(i).padStart(4,'0')+'.jpg';
       var up=await db.storage.from('clinic-images').upload(path, blob, {contentType:'image/jpeg', upsert:true});
       if(up.error) throw up.error;
       var url=db.storage.from('clinic-images').getPublicUrl(path).data.publicUrl;
@@ -2884,28 +2799,31 @@ async function uploadScrollStoryFrames(e){
       console.warn('Frame upload failed', f.name, err);
     }
   }
-  scrollStoryFrames=scrollStoryFrames.concat(uploaded);
-  await db.from('settings').upsert({key:'scrollstory_frames', value:JSON.stringify(scrollStoryFrames)});
+  if(ssAdminDevice==='mobile'){ scrollStoryFramesMobile=scrollStoryFramesMobile.concat(uploaded); }
+  else { scrollStoryFrames=scrollStoryFrames.concat(uploaded); }
+  await db.from('settings').upsert({key:ssActiveAdminKey(), value:JSON.stringify(ssActiveAdminFrames())});
   renderScrollStoryAdmin();
   renderScrollStory();
-  showToast('✅ Added '+uploaded.length+' frame'+(uploaded.length===1?'':'s')+'!');
+  showToast('✅ Added '+uploaded.length+' '+devTag+' frame'+(uploaded.length===1?'':'s')+'!');
   e.target.value='';
 }
 
 async function removeScrollStoryFrame(idx){
-  scrollStoryFrames.splice(idx,1);
-  await db.from('settings').upsert({key:'scrollstory_frames', value:JSON.stringify(scrollStoryFrames)});
+  var arr=ssActiveAdminFrames();
+  arr.splice(idx,1);
+  await db.from('settings').upsert({key:ssActiveAdminKey(), value:JSON.stringify(arr)});
   renderScrollStoryAdmin();
   renderScrollStory();
 }
 
 async function clearScrollStoryFrames(){
-  if(!confirm('Remove all '+scrollStoryFrames.length+' frames from the scroll story?')) return;
-  scrollStoryFrames=[];
-  await db.from('settings').upsert({key:'scrollstory_frames', value:'[]'});
+  var arr=ssActiveAdminFrames();
+  if(!confirm('Remove all '+arr.length+' '+ssAdminDevice+' frames from the scroll story?')) return;
+  if(ssAdminDevice==='mobile'){ scrollStoryFramesMobile=[]; } else { scrollStoryFrames=[]; }
+  await db.from('settings').upsert({key:ssActiveAdminKey(), value:'[]'});
   renderScrollStoryAdmin();
   renderScrollStory();
-  showToast('🗑 Scroll story cleared');
+  showToast('🗑 '+(ssAdminDevice==='mobile'?'Mobile':'Desktop')+' scroll story cleared');
 }
 
 function renderScrollStoryAdmin(){
@@ -2913,14 +2831,15 @@ function renderScrollStoryAdmin(){
   var status=document.getElementById('ssUploadStatus');
   var clearBtn=document.getElementById('ssClearBtn');
   if(!grid) return;
-  if(clearBtn) clearBtn.style.display=scrollStoryFrames.length?'inline-block':'none';
-  if(status) status.textContent=scrollStoryFrames.length?(scrollStoryFrames.length+' frame'+(scrollStoryFrames.length===1?'':'s')+' in the sequence.'):'No frames yet — add photos to enable the scroll story.';
-  var showCount=Math.min(scrollStoryFrames.length, 240);
-  var html=scrollStoryFrames.slice(0,showCount).map(function(url,i){
+  var frames=ssActiveAdminFrames();
+  if(clearBtn) clearBtn.style.display=frames.length?'inline-block':'none';
+  if(status) status.textContent=frames.length?(frames.length+' '+ssAdminDevice+' frame'+(frames.length===1?'':'s')+' in the sequence.'):('No '+ssAdminDevice+' frames yet'+(ssAdminDevice==='mobile'?' — phones will fall back to the desktop frames until you add some.':'.'));
+  var showCount=Math.min(frames.length, 240);
+  var html=frames.slice(0,showCount).map(function(url,i){
     return '<div class="ssfitem"><img src="'+url+'" loading="lazy"><span class="ssfidx">'+(i+1)+'</span><button class="ssfx" onclick="removeScrollStoryFrame('+i+')" title="Remove">✕</button></div>';
   }).join('');
-  if(scrollStoryFrames.length>showCount){
-    html+='<div class="ssfitem" style="display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--tl);text-align:center;padding:6px">+'+(scrollStoryFrames.length-showCount)+' more</div>';
+  if(frames.length>showCount){
+    html+='<div class="ssfitem" style="display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--tl);text-align:center;padding:6px">+'+(frames.length-showCount)+' more</div>';
   }
   grid.innerHTML=html;
 }
@@ -3151,7 +3070,7 @@ function switchTab(name,btn){
   if(name==='analytics')renderAnalytics();
   if(name==='broadcast')renderBroadcastList();
   if(name==='aitrain'){document.getElementById('aitraintxt').value=aiTraining;document.getElementById('aitrainstatus').style.display='none';}
-  if(name==='sitesettings'){renderThemeGrid();renderIntroAdmin();renderTopVideoAdmin();renderScrollStoryAdmin();loadStatsForm();loadDoctorProfileForm();loadHeroSectionForm();}
+  if(name==='sitesettings'){renderThemeGrid();renderTopVideoAdmin();renderScrollStoryAdmin();loadStatsForm();loadDoctorProfileForm();loadHeroSectionForm();}
   if(name==='pwd'){
     document.getElementById('curUsernameDisplay').textContent=ADMIN_USER;
     document.getElementById('pwdUsernameDisplay').textContent=ADMIN_USER;
